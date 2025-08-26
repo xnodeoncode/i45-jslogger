@@ -1,9 +1,5 @@
-import { EventLog } from "eventLog";
-
-export { EventLog };
-
 export class Logger {
-  #eventLog = new EventLog();
+  #events = [];
   constructor() {
     this.consoleInfo = console.info.bind(console);
     this.consoleWarn = console.warn.bind(console);
@@ -16,24 +12,36 @@ export class Logger {
     this.consoleInfo("Logger initialized.");
   }
   info = function (message = "", ...args) {
-    this.#eventLog.addEvent("INFO", message);
+    this.addEvent("INFO", message);
     this.consoleInfo(`[INFO] ${new Date().toISOString()}:`, message, ...args);
   };
   warn = function (message = "", ...args) {
-    this.#eventLog.addEvent("WARN", message);
+    this.addEvent("WARN", message);
     this.consoleWarn(`[WARN] ${new Date().toISOString()}:`, message, ...args);
   };
   error = function (message = "", ...args) {
-    this.#eventLog.addEvent("ERROR", message);
+    this.addEvent("ERROR", message);
     this.consoleError(`[ERROR] ${new Date().toISOString()}:`, message, ...args);
   };
 
-  clear = function () {
-    this.#eventLog.clear();
-    console.clear();
+  addEvent = function (type, event) {
+    this.#events.push({
+      id: new Date().getTime(),
+      type,
+      event,
+      timestamp: new Date().toISOString(),
+    });
+    window.localStorage.setItem("eventLog", JSON.stringify(this.events));
   };
 
-  getEvents() {
-    return this.#eventLog.getEvents();
-  }
+  getEvents = function () {
+    return this.#events.length
+      ? this.#events
+      : JSON.parse(window.localStorage.getItem("eventLog")) || [];
+  };
+
+  clear = function () {
+    this.#events = [];
+    window.localStorage.removeItem("eventLog");
+  };
 }

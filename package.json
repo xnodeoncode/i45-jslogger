@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "checkin": "git add . && git commit -m 'See CHANGES.md for a list of changes.'",
-    "build": "cp -r src dist"
+    "build": "cp -r src/* dist/"
   },
   "files": [
     "/dist",
@@ -19,7 +19,6 @@
     "javascript",
     "logger"
   ],
-  "author": "cisguru",
-  "license": "ISC",
-  "type": "module"
+  "author": "CIS Guru <cisguru@outlook.com>",
+  "license": "ISC"
 }
