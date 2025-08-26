@@ -1,5 +1,5 @@
 export class Logger {
-  #events = [];
+  #events;
   constructor() {
     this.consoleInfo = console.info.bind(console);
     this.consoleWarn = console.warn.bind(console);
@@ -9,7 +9,8 @@ export class Logger {
     this.warn = this.warn.bind(this);
     this.error = this.error.bind(this);
 
-    this.consoleInfo("Logger initialized.");
+    this.#events = [];
+    this.info("Logger initialized.");
   }
   info = function (message = "", ...args) {
     this.addEvent("INFO", message);
@@ -31,7 +32,11 @@ export class Logger {
       event,
       timestamp: new Date().toISOString(),
     });
-    window.localStorage.setItem("eventLog", JSON.stringify(this.events));
+    try {
+      window.localStorage.setItem("eventLog", JSON.stringify(this.#events));
+    } catch (error) {
+      this.consoleError("Failed to save event log to localStorage:", error);
+    }
   };
 
   getEvents = function () {
