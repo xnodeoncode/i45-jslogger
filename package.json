@@ -1,7 +1,7 @@
 {
   "name": "i45-jslogger",
   "version": "1.0.0",
-  "description": "A simple JavaScript logger for capturing and outputting to the console and local storage.",
+  "description": "A simple JavaScript logger for capturing events in the console and local storage.",
   "main": "./dist/logger.js",
   "type": "module",
   "scripts": {
@@ -13,7 +13,10 @@
     "/dist",
     "README.md",
     "CHANGES.md",
-    "package.json"
+    "package.json",
+    "console.png",
+    "local-storage.png",
+    "logging-levels.png"
   ],
   "keywords": [
     "logging",
@@ -21,5 +24,13 @@
     "logger"
   ],
   "author": "CIS Guru <cisguru@outlook.com>",
-  "license": "ISC"
+  "license": "ISC",
+  "homepage": "https://github.com/xnodeoncode/i45-jslogger",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xnodeoncode/i45-jslogger.git"
+  },
+  "bugs": {
+    "url": "https://github.com/xnodeoncode/i45-jslogger/issues"
+  }
 }
