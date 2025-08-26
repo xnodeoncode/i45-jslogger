@@ -1,4 +1,4 @@
-import { EventLog } from "eventLog.js";
+import { EventLog } from "eventLog";
 
 export { EventLog };
 
