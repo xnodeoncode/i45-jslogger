@@ -1,0 +1,25 @@
+{
+  "name": "i45-jslogger",
+  "version": "1.0.0",
+  "description": "A simple JavaScript logger for capturing and outputting to the console and local storage.",
+  "main": "logger.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "checkin": "git add . && git commit -m 'See CHANGES.md for a list of changes.'",
+    "build": "cp -r src dist"
+  },
+  "files": [
+    "/dist",
+    "README.md",
+    "CHANGES.md",
+    "package.json"
+  ],
+  "keywords": [
+    "logging",
+    "javascript",
+    "logger"
+  ],
+  "author": "cisguru",
+  "license": "ISC",
+  "type": "module"
+}
