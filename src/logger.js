@@ -10,7 +10,6 @@ export class Logger {
     this.error = this.error.bind(this);
 
     this.#events = [];
-    this.info("Logger initialized.");
   }
   info = function (message = "", ...args) {
     this.addEvent("INFO", message);
