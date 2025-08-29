@@ -6,3 +6,10 @@
 
 - Initial release.
 - Basic logging to the console and local storage.
+
+## v1.1.0
+
+### August 29, 2025
+
+- Added iLogger interface that can be used to implement and extend the Logger.
+- Added iLoggerValidator to validate a custom Logger against the interface.

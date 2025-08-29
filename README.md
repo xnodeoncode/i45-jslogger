@@ -4,6 +4,14 @@ A basic, browser based, logger to track events during development and testing. L
 
 A useful tool for debugging.
 
+## Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [Logging Levels](#logging-levels)
+- [Using a class/module](#classmodule-usage)
+- [iLogger Interface](#ilogger-interface)
+
 ## Installation
 
 ```javascript
@@ -99,4 +107,100 @@ myClass.doSomething();
 ```
 // console output
 [INFO] 2025-08-26T14:41:25.073z: We've just done something.
+```
+
+## iLogger Interface
+
+i45-jslogger has an interface that can be implemented and extended as needed as long as the required methods are provided. The method signatures are below.
+
+```javascript
+export const ILogger = {
+  info: (message) => {},
+  warn: (message) => {},
+  error: (message) => {},
+  getEvents: () => {},
+};
+```
+
+Implementation of this interface is required when using custom loggers with the [i45](https://www.npmjs.com/package/i45) package.
+
+### Complete Example
+
+```javascript
+
+import { Logger, iLogger, iLoggerValidator } from "i45-jslogger";
+
+export class MyClass {
+  // private field for logging.
+  #loggingEnabled;
+  #logger;
+
+  constructor() {
+    this.#loggingEnabled = false;
+    this.#logger = new Logger();
+  }
+
+  enableLogging(value = false) {
+    if (typeof value !== "boolean") {
+      // if logging is enabled, the error will be logged and also thrown to stop further processing.
+
+      // the second parameter, throwError, determines if the error is thrown or not.
+      this.#error(`The method enableLogging() expected a boolean, but got ${typeof value}`, throwError=true);
+    }
+    this.#loggingEnabled = value;
+  }
+
+  doSomething(){
+
+    try {
+        // log the action.
+        this.#info("We're working on somethings".);
+
+        //... method code
+
+    } catch (e){
+
+        // log and/or throw the error. [See method below.]
+        this.#error("An error occurred.",throwError = true, e);
+
+    } finally {
+
+        this.#info("We're done.");
+    }
+    return this;
+  }
+
+  useCustomLogger(myCustomLogger){
+    if(iLoggerValidator.isValid(myCustomLogger, iLogger))
+      this.#logger = myCustomLogger;
+  }
+
+  #info(message, ...args){
+    if(this.#loggingEnabled){
+      this.#logger.info(messge, ...args);
+    }
+  }
+
+  #warn(message, ...args){
+    if(this.#loggingEnabled){
+      this.#logger.warn(message, ...args);
+    }
+  }
+
+  #error(message, throwError = false, ...args){
+    if(this.#loggingEnabled){
+      this.#logger.error(message, ...args);
+    }
+
+    // An error can still be thrown with logging disabled.
+    if(throwError){
+      throw new Error(message, ...args);
+    }
+  }
+}
+
+var myClass = new MyClass();
+myClass.useCustomLogger(myCustomLogger);
+myClass.enableLogging(true);
+myClass.doSomething();
 ```
