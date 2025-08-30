@@ -1,5 +1,5 @@
-import { iLogger } from "iLogger.js";
-import { iLoggerValidator } from "iLoggerValidator.js";
+import { iLogger } from "./iLogger.js";
+import { iLoggerValidator } from "./iLoggerValidator.js";
 
 export { iLogger, iLoggerValidator };
 
