@@ -1,3 +1,8 @@
+import { iLogger } from "iLogger.js";
+import { iLoggerValidator } from "iLoggerValidator.js";
+
+export { iLogger, iLoggerValidator };
+
 export class Logger {
   #events;
   constructor() {
