@@ -1,6 +1,6 @@
 {
   "name": "i45-jslogger",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "A simple JavaScript logger for capturing events in the console and local storage.",
   "main": "./dist/logger.js",
   "type": "module",
