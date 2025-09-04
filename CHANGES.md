@@ -28,3 +28,4 @@
 - Added support for dispatch events.
 - Updated documentation.
 - Added test project.
+- iLoggerValidator now validates against an Array of method names instead of an object.

@@ -17,7 +17,7 @@ i45-jslogger exposes the following properties:
 - loggingEnabled:_boolean_
   - Enables/disables logging.
 - suppressNative:_boolean_
-  - Enables/disables native logging, client logs and dispatch events are not affected.
+  - Enables/disables native logging, client messages and dispatch events are not affected.
 - suppressConsole:_boolean_
   - Enables/disables console messages.
 
