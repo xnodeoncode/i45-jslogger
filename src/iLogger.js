@@ -7,9 +7,11 @@
  */
 
 /** @type {iLogger} */
-export const iLogger = {
-  info: (message) => {},
-  warn: (message) => {},
-  error: (message) => {},
-  getEvents: () => {},
-};
+// export const iLogger = {
+//   log: (message, ...args) => {},
+//   info: (message, ...args) => {},
+//   warn: (message, ...args) => {},
+//   error: (message, ...args) => {},
+// };
+
+export const iLogger = ["log", "info", "warn", "error", "getEvents"];
