@@ -7,8 +7,9 @@ A browser based logger to track events during development and testing. Log entri
 - [Installation](#installation)
 - [Usage](#usage)
 - [Logging Levels](#logging-levels)
-- [Using a class/module](#classmodule-usage)
+- [Using a Class/Module](#classmodule-usage)
 - [Using a Custom Logger (Client)](#using-a-custom-logger-client)
+- [Event Listeners](#event-listeners)
 
 ## Properties
 
@@ -76,7 +77,7 @@ Local storage output:
 
 ## Logging Levels
 
-Set logging levels in the Console.
+Filter by logging levels in the Console.
 
 Console set to display warning and errors only.
 ![Logging levels](logging-levels.png)
@@ -110,7 +111,7 @@ export class MyClass {
     //... method code
 
     // log the action.
-    this.#info("We've just done somethings".);
+    this.#info("We've just done something".);
   }
 
   #info(message, ...args){
@@ -149,7 +150,7 @@ myClass.doSomething();
 
 ## Using a Custom Logger (Client)
 
-i45-jslogger accepts additional clients as long as the required methods are implemented.
+i45-jslogger accepts additional clients, such as a file system logger, as long as the required methods are implemented.
 
 Required methods:
 
@@ -157,7 +158,6 @@ Required methods:
 - info()
 - warn()
 - error()
-- getEvents()
 
 Add a new logger with:
 
@@ -196,13 +196,14 @@ export class MyClass {
       this.#error(`The method enableLogging() expected a boolean, but got ${typeof value}`, throwError=true);
     }
     this.#loggingEnabled = value;
+    return this;
   }
 
   doSomething(){
 
     try {
         // log the action.
-        this.#info("We're working on somethings".);
+        this.#info("Working on something".);
 
         //... method code
 
@@ -213,7 +214,7 @@ export class MyClass {
 
     } finally {
 
-        this.#info("We're done.");
+        this.#info("Something is done.");
     }
     return this;
   }
@@ -224,18 +225,22 @@ export class MyClass {
     // the logging events on each client is called in the order that they were added.
     // customLogger1.info(), customLogger2.info(),...
       this.#logger.addClient(myCustomLogger);
+
+      return this;
   }
 
   #info(message, ...args){
     if(this.#loggingEnabled){
       this.#logger.info(messge, ...args);
     }
+    return this;
   }
 
   #warn(message, ...args){
     if(this.#loggingEnabled){
       this.#logger.warn(message, ...args);
     }
+    return this;
   }
 
   #error(message, throwError = false, ...args){
@@ -247,18 +252,27 @@ export class MyClass {
     if(throwError){
       throw new Error(message, ...args);
     }
+    return this;
   }
 }
 
 var myClass = new MyClass();
-myClass.useCustomLogger(myCustomLogger);
-myClass.enableLogging(true);
+myClass.useCustomLogger(myCustomLogger).enableLogging(true);
 myClass.doSomething();
 ```
 
 ## Event Listeners
 
-i45-jslogger dispatches custom events on the window object. An EventListener can be used to subscribe to the events.
+i45-jslogger dispatches custom events on the window object. An [EventListener](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) can be used to subscribe to the events.
+
+The events dispatched are (case-sensitive):
+
+- "LOG"
+- "INFO"
+- "WARN"
+- "ERROR"
+
+Note that event names are case sensitive. See the examples below.
 
 ```javascript
 window.addEventListener("LOG", (event) => {

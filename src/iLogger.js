@@ -14,4 +14,4 @@
 //   error: (message, ...args) => {},
 // };
 
-export const iLogger = ["log", "info", "warn", "error", "getEvents"];
+export const iLogger = ["log", "info", "warn", "error"];

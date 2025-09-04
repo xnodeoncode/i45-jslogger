@@ -29,3 +29,7 @@
 - Updated documentation.
 - Added test project.
 - iLoggerValidator now validates against an Array of method names instead of an object.
+
+## v1.3.1
+
+- Removed getEvents() as a required method for custom loggers.
