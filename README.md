@@ -184,7 +184,8 @@ export class MyClass {
   constructor() {
     this.#logger = new Logger();
 
-    // logging can be enabled/disabled either in the consuming class, or on the logger itself. For example: this.#logger.loggingEnabled = true|false;
+    // logging can be enabled/disabled either in the consuming class, or on the logger itself.
+    // For example: this.#logger.loggingEnabled = true|false;
     this.#loggingEnabled = true;
   }
 
