@@ -26,29 +26,97 @@ i45-jslogger exposes the following properties:
 
 i45-jslogger exposes the following methods:
 
-- log():_this_
+#### Supported Logging Levels
+
+- log():
+
+  _@param: Message(type:string)_
+
+  _@param: ...args(type:any)_
+
+  _@returns: this_
+
   - Executes the log method for all registered clients.
-- info():_this_
+
+- info():
+
+  _@param: Message(type:string)_
+
+  _@param: ...args(type:any)_
+
+  _@returns: this_
+
   - Executes the info method for all registered clients.
-- warn():_this_
+
+- warn():
+
+  _@param: Message(type:string)_
+
+  _@param: ...args(type:any)_
+
+  _@returns: this_
+
   - Executes the warn method for all registered clients.
-- error():_this_
+
+- error():
+
+  _@param: Message(type:string)_
+
+  _@param: ...args(type:any)_
+
+  _@returns: this_
+
   - Executes the error message for all registered clients.
-- isValidClient():_boolean_
+
+- isValidClient():
+
+  _@param: custom logger(type:object)_
+
+  _@returns: boolean_
+
   - Validates that a client has the required methods.
-- addClient():_this_
-  - Validates that a client has the required methods and adds it to the collection.
-- removeClient():_this_
+
+- addClient():
+
+  _@param: custom logger(type:object)_
+  _@returns: this_
+
+  - Validates that a client has the required methods and adds it call tree.
+
+- removeClient():
+
+  _@param: name(type:string)_
+
+  _@returns: this_
+
   - Removes a client by name.
-- clients():_Array_
+
+- clients():
+
+  _@returns: Array_
+
   - Returns an array of all registered clients.
-- removeAllClients():_this_
+
+- removeAllClients():
+
+  _@returns: this_
+
   - Clears all registered clients.
+
 - addEvent():_this_
+
   - Adds an event to the event log without logging.
-- getEvents():_Array_
+
+- getEvents():
+
+  _@returns: Array_
+
   - Returns an array of all events captured in the event log.
-- clearEvents():_this_
+
+- clearEvents():
+
+  _@returns: \_this_
+
   - Removes all events from local storage and the console.
 
 ## Installation
@@ -168,7 +236,7 @@ var logger = new Logger();
 logger.addClient(myCustomLogger);
 ```
 
-Each call to a method on i45-jslogger will call the corresponding method on each custom logger added.
+Each method call on i45-jslogger will result in the corresponding method on clients. Client calls are synchronous and in the order that the clients were added. See the sample code below.
 
 ### Complete Example
 
@@ -223,8 +291,8 @@ export class MyClass {
   useCustomLogger(myCustomLogger){
     // add new client
     // multiple clients can be added.
-    // the logging events on each client is called in the order that they were added.
-    // customLogger1.info(), customLogger2.info(),...
+    // Client calls are synchronous and occur in the order that clients are added.
+    // Logger.info() calls -> customLogger1.info(), customLogger2.info(), ...etc.
       this.#logger.addClient(myCustomLogger);
 
       return this;
@@ -266,14 +334,14 @@ myClass.doSomething();
 
 i45-jslogger dispatches custom events on the window object. An [EventListener](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) can be used to subscribe to the events.
 
-The events dispatched are (case-sensitive):
+The following dispatch events are (case-sensitive):
 
 - "LOG"
 - "INFO"
 - "WARN"
 - "ERROR"
 
-Note that event names are case sensitive. See the examples below.
+To capture the event, add an event listener as below.
 
 ```javascript
 window.addEventListener("LOG", (event) => {
@@ -295,7 +363,7 @@ window.addEventListener("ERROR", (event) => {
 
 ### Disable Events
 
-Window events can be disabled using:
+Window events are enabled by default, and can be disabled using:
 
 ```javascript
 import { Logger } from "i45-jslogger";

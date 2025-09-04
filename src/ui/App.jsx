@@ -22,8 +22,17 @@ logger.addClient(anotherLoggerInstance);
 logger.addClient(new yetAnotherLogger());
 
 logger.info("Now logging with three clients.");
+logger.log("This is a log message.");
+logger.warn("This is a warning message.");
+logger.error("This is an error message.");
 
 window.addEventListener("INFO", (event) => {
+  console.log("Custom event received:", event.detail);
+});
+window.addEventListener("WARN", (event) => {
+  console.log("Custom event received:", event.detail);
+});
+window.addEventListener("ERROR", (event) => {
   console.log("Custom event received:", event.detail);
 });
 
