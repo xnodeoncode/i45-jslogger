@@ -22,4 +22,9 @@
 
 ## v1.3.0
 
+### September 3, 2025
+
 - Added support for custom logger.
+- Added support for dispatch events.
+- Updated documentation.
+- Added test project.
