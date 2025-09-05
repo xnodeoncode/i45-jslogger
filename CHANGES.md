@@ -35,3 +35,4 @@
 ### September 4, 2025
 
 - Removed getEvents() as a required method for custom loggers.
+- Changed react and react-dom from dependencies to dev dependencies.
