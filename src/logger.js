@@ -7,6 +7,11 @@ export class Logger {
   #events;
   #clients;
 
+  #loggingEnabled;
+  #suppressNative;
+  #suppressConsole;
+  #dispatchEvents;
+
   constructor() {
     this.consoleLog = console.log.bind(console);
     this.consoleInfo = console.info.bind(console);
@@ -20,12 +25,56 @@ export class Logger {
 
     this.#events = [];
     this.#clients = new Set();
+
+    this.#loggingEnabled = true;
+    this.#suppressNative = false;
+    this.#suppressConsole = false;
+    this.#dispatchEvents = true;
   }
 
-  loggingEnabled = true;
-  suppressNative = false;
-  suppressConsole = false;
-  dispatchEvents = true;
+  get loggingEnabled() {
+    return this.#loggingEnabled;
+  }
+
+  set loggingEnabled(value) {
+    if (typeof value !== "boolean") {
+      throw new TypeError("loggingEnabled must be a boolean.");
+    }
+    this.#loggingEnabled = value;
+  }
+
+  get suppressNative() {
+    return this.#suppressNative;
+  }
+
+  set suppressNative(value) {
+    if (typeof value !== "boolean") {
+      throw new TypeError("suppressNative must be a boolean.");
+    }
+    this.#suppressNative = value;
+  }
+
+  get suppressConsole() {
+    return this.#suppressConsole;
+  }
+
+  set suppressConsole(value) {
+    if (typeof value !== "boolean") {
+      throw new TypeError("suppressConsole must be a boolean.");
+    }
+    this.#suppressConsole = value;
+  }
+
+  get dispatchEvents() {
+    return this.#dispatchEvents;
+  }
+
+  set dispatchEvents(value) {
+    if (typeof value !== "boolean") {
+      throw new TypeError("dispatchEvents must be a boolean.");
+    }
+    this.#dispatchEvents = value;
+  }
 
   log(message = "", ...args) {
     if (!this.loggingEnabled) return;
@@ -185,10 +234,31 @@ export class Logger {
       : JSON.parse(window.localStorage.getItem("eventLog")) || [];
   }
 
+  /*******************************************************************
+   * @deprecated Use clearEventLog(), clearConsole(), or clearAll() instead.
+   * Clear all events from memory and localStorage, and clear the console.
+   ********************************************************************/
   clearEvents() {
     this.#events = [];
     window.localStorage.removeItem("eventLog");
     console.clear();
+    return this;
+  }
+
+  clearEventLog() {
+    this.#events = [];
+    window.localStorage.removeItem("eventLog");
+    return this;
+  }
+
+  clearConsole() {
+    console.clear();
+    return this;
+  }
+
+  clearAll() {
+    this.clearEventLog();
+    this.clearConsole();
     return this;
   }
 }

@@ -36,3 +36,11 @@
 
 - Removed getEvents() as a required method for custom loggers.
 - Changed react and react-dom from dependencies to dev dependencies.
+
+## v1.4.0
+
+### September 6, 2025
+
+- Deprecated clearEvents() method.
+- Added clearEventLog(), clearConsole(), and clearAll() methods.
+- Added getters and setters with validation for properties.
