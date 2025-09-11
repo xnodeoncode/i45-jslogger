@@ -4,12 +4,20 @@ import { iLoggerValidator } from "./iLoggerValidator.js";
 export { iLogger, iLoggerValidator };
 
 export class Logger {
+  // Private fields
+
+  // collections
   #events;
   #clients;
 
-  #loggingEnabled;
+  // settings
+  #enableEvents;
+  #enableLogging;
   #suppressNative;
   #suppressConsole;
+
+  // Deprecated fields
+  #loggingEnabled;
   #dispatchEvents;
 
   constructor() {
@@ -26,21 +34,54 @@ export class Logger {
     this.#events = [];
     this.#clients = new Set();
 
-    this.#loggingEnabled = true;
+    this.#enableEvents = true;
+    this.#enableLogging = true;
     this.#suppressNative = false;
     this.#suppressConsole = false;
+
+    // These are deprecated, use enableEvents and enableLogging properties instead.
     this.#dispatchEvents = true;
+    this.#loggingEnabled = true;
   }
 
+  /*******************************************************************
+   * Getters and Setters
+   ********************************************************************/
+
+  /** Enable or disable logging globally.
+   * When disabled, no logs will be recorded or output.
+   * Default is true.
+   * @deprecated Use loggingEnabled property instead.
+   ********************************************************************/
   get loggingEnabled() {
     return this.#loggingEnabled;
   }
 
+  /** Enable or disable logging globally.
+   * When disabled, no logs will be recorded or output.
+   * Default is true.
+   * @deprecated Use loggingEnabled property instead.
+   ********************************************************************/
   set loggingEnabled(value) {
     if (typeof value !== "boolean") {
       throw new TypeError("loggingEnabled must be a boolean.");
     }
     this.#loggingEnabled = value;
+  }
+
+  /** Enable or disable logging globally.
+   * When disabled, no logs will be recorded or output.
+   * Default is true.
+   *
+   ********************************************************************/
+  set enableLogging(value) {
+    if (typeof value !== "boolean") {
+      throw new TypeError("enableLogging must be a boolean.");
+    }
+    this.#enableLogging = value;
+  }
+  get enableLogging() {
+    return this.#enableLogging;
   }
 
   get suppressNative() {
@@ -65,10 +106,21 @@ export class Logger {
     this.#suppressConsole = value;
   }
 
+  /** Enable or disable event dispatching.
+   * When enabled, log events will be dispatched as CustomEvents on the window object.
+   * Default is true.
+   * @deprecated Use enableEvents property instead.
+   *
+   ********************************************************************/
   get dispatchEvents() {
     return this.#dispatchEvents;
   }
-
+  /** Enable or disable event dispatching.
+   * When enabled, log events will be dispatched as CustomEvents on the window object.
+   * Default is true.
+   * @deprecated Use enableEvents property instead.
+   *
+   ********************************************************************/
   set dispatchEvents(value) {
     if (typeof value !== "boolean") {
       throw new TypeError("dispatchEvents must be a boolean.");
@@ -76,8 +128,24 @@ export class Logger {
     this.#dispatchEvents = value;
   }
 
+  /** Enable or disable event dispatching.
+   * When enabled, log events will be dispatched as CustomEvents on the window object.
+   * Default is true.
+   *
+   ********************************************************************/
+  set enableEvents(value) {
+    if (typeof value !== "boolean") {
+      throw new TypeError("enableEvents must be a boolean.");
+    }
+    this.#enableEvents = value;
+  }
+
+  get enableEvents() {
+    return this.#enableEvents;
+  }
+
   log(message = "", ...args) {
-    if (!this.loggingEnabled) return;
+    if (!this.#enableLogging) return;
 
     if (!this.suppressNative) {
       this.addEvent("LOG", message);
@@ -88,7 +156,7 @@ export class Logger {
     if (this.#clients.size) {
       this.#clients.forEach((client) => client.log(message, ...args));
     }
-    if (window && this.dispatchEvents) {
+    if (window && this.enableEvents) {
       window.dispatchEvent(
         new CustomEvent("LOG", {
           detail: { message, args, timestamp: new Date().toISOString() },
@@ -99,7 +167,7 @@ export class Logger {
   }
 
   info(message = "", ...args) {
-    if (!this.loggingEnabled) return;
+    if (!this.#enableLogging) return;
     if (!this.suppressNative) {
       this.addEvent("INFO", message);
     }
@@ -109,7 +177,7 @@ export class Logger {
     if (this.#clients.size) {
       this.#clients.forEach((client) => client.info(message, ...args));
     }
-    if (window && this.dispatchEvents) {
+    if (window && this.enableEvents) {
       window.dispatchEvent(
         new CustomEvent("INFO", {
           detail: { message, args, timestamp: new Date().toISOString() },
@@ -120,7 +188,7 @@ export class Logger {
   }
 
   warn(message = "", ...args) {
-    if (!this.loggingEnabled) return;
+    if (!this.#enableLogging) return;
     if (!this.suppressNative) {
       this.addEvent("WARN", message);
     }
@@ -130,7 +198,7 @@ export class Logger {
     if (this.#clients.size) {
       this.#clients.forEach((client) => client.warn(message, ...args));
     }
-    if (window && this.dispatchEvents) {
+    if (window && this.enableEvents) {
       window.dispatchEvent(
         new CustomEvent("WARN", {
           detail: { message, args, timestamp: new Date().toISOString() },
@@ -141,7 +209,7 @@ export class Logger {
   }
 
   error(message = "", ...args) {
-    if (!this.loggingEnabled) return;
+    if (!this.enableLogging) return;
     if (!this.suppressNative) {
       this.addEvent("ERROR", message);
     }
@@ -155,7 +223,7 @@ export class Logger {
     if (this.#clients.size) {
       this.#clients.forEach((client) => client.error(message, ...args));
     }
-    if (window && this.dispatchEvents) {
+    if (window && this.enableEvents) {
       window.dispatchEvent(
         new CustomEvent("ERROR", {
           detail: { message, args, timestamp: new Date().toISOString() },
