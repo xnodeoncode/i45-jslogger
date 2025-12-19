@@ -67,10 +67,10 @@ analyticsLogger.suppressConsole = true; // Only log to localStorage and clients
 ```
 
 **Console output:**
-![Console output](https://raw.githubusercontent.com/xnodeoncode/i45-jslogger/main/docs/images/console.png)
+![Console output](https://raw.githubusercontent.com/xnodeoncode/i45-jslogger/master/docs/images/console.png)
 
 **localStorage output:**
-![Local storage](https://raw.githubusercontent.com/xnodeoncode/i45-jslogger/main/docs/images/local-storage.png)
+![Local storage](https://raw.githubusercontent.com/xnodeoncode/i45-jslogger/master/docs/images/local-storage.png)
 
 ## API Overview
 
@@ -130,7 +130,7 @@ logger.maxEvents = null; // Default: null (unlimited)
 
 Filter by log levels in the browser console:
 
-![Logging levels](https://raw.githubusercontent.com/xnodeoncode/i45-jslogger/main/docs/images/logging-levels.png)
+![Logging levels](https://raw.githubusercontent.com/xnodeoncode/i45-jslogger/master/docs/images/logging-levels.png)
 
 ## Custom Logger Clients
 
@@ -296,7 +296,7 @@ const events: LogEvent[] = logger.getEvents();
 
 Contributions welcome! Please see [CHANGES.md](CHANGES.md) for the full changelog and migration guides.
 
-Planning for v3.0.0 is underway - see the [v3.0.0 roadmap](https://github.com/xnodeoncode/i45-jslogger/blob/main/docs/v3.0.0.md) for upcoming features.
+Planning for v3.0.0 is underway - see the [v3.0.0 roadmap](https://github.com/xnodeoncode/i45-jslogger/blob/master/docs/v3.0.0.md) for upcoming features.
 
 ## License
 
