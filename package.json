@@ -3,24 +3,32 @@
   "version": "1.4.0",
   "description": "A simple JavaScript logger for capturing events in the console and local storage.",
   "main": "./dist/logger.js",
+  "module": "./dist/logger.js",
   "type": "module",
+  "types": "./dist/logger.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/logger.js",
+      "types": "./dist/logger.d.ts"
+    },
+    "./validator": {
+      "import": "./dist/iLoggerValidator.js"
+    },
+    "./interface": {
+      "import": "./dist/iLogger.js"
+    }
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node test-v1.4.0.js",
     "checkin": "git add . && git commit -m 'See CHANGES.md for a list of changes.'",
-    "build": "cp -r src/logger.js dist/ && cp -r src/iLogger.js dist/ && cp -r src/iLoggerValidator.js dist/",
-    "dev": "vite",
-    "vite-build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "clean": "rimraf dist",
+    "build": "npm run clean && rollup -c",
+    "lint": "eslint ."
   },
   "files": [
     "/dist",
     "README.md",
-    "CHANGES.md",
-    "package.json",
-    "console.png",
-    "local-storage.png",
-    "logging-levels.png"
+    "CHANGES.md"
   ],
   "keywords": [
     "logging",
@@ -29,17 +37,13 @@
   ],
   "dependencies": {},
   "devDependencies": {
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
     "@eslint/js": "^9.33.0",
-    "@types/react": "^19.1.10",
-    "@types/react-dom": "^19.1.7",
-    "@vitejs/plugin-react": "^5.0.0",
     "eslint": "^9.33.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
-    "vite": "^7.1.2"
+    "rollup": "^4.30.1",
+    "@rollup/plugin-node-resolve": "^15.3.1",
+    "rollup-plugin-dts": "^6.1.1",
+    "rimraf": "^6.0.1"
   },
   "author": "CIS Guru <cisguru@outlook.com>",
   "license": "ISC",

@@ -4,6 +4,13 @@ import { iLoggerValidator } from "./iLoggerValidator.js";
 export { iLogger, iLoggerValidator };
 
 export class Logger {
+  // Environment detection
+  static isBrowser = typeof window !== "undefined";
+  static hasLocalStorage =
+    Logger.isBrowser && typeof window.localStorage !== "undefined";
+  static supportsCustomEvents =
+    Logger.isBrowser && typeof CustomEvent !== "undefined";
+
   // Private fields
 
   // collections
@@ -156,7 +163,7 @@ export class Logger {
     if (this.#clients.size) {
       this.#clients.forEach((client) => client.log(message, ...args));
     }
-    if (window && this.enableEvents) {
+    if (Logger.supportsCustomEvents && this.enableEvents) {
       window.dispatchEvent(
         new CustomEvent("LOG", {
           detail: { message, args, timestamp: new Date().toISOString() },
@@ -177,7 +184,7 @@ export class Logger {
     if (this.#clients.size) {
       this.#clients.forEach((client) => client.info(message, ...args));
     }
-    if (window && this.enableEvents) {
+    if (Logger.supportsCustomEvents && this.enableEvents) {
       window.dispatchEvent(
         new CustomEvent("INFO", {
           detail: { message, args, timestamp: new Date().toISOString() },
@@ -198,7 +205,7 @@ export class Logger {
     if (this.#clients.size) {
       this.#clients.forEach((client) => client.warn(message, ...args));
     }
-    if (window && this.enableEvents) {
+    if (Logger.supportsCustomEvents && this.enableEvents) {
       window.dispatchEvent(
         new CustomEvent("WARN", {
           detail: { message, args, timestamp: new Date().toISOString() },
@@ -223,7 +230,7 @@ export class Logger {
     if (this.#clients.size) {
       this.#clients.forEach((client) => client.error(message, ...args));
     }
-    if (window && this.enableEvents) {
+    if (Logger.supportsCustomEvents && this.enableEvents) {
       window.dispatchEvent(
         new CustomEvent("ERROR", {
           detail: { message, args, timestamp: new Date().toISOString() },
@@ -245,28 +252,29 @@ export class Logger {
   addClient(client) {
     if (this.#clients.has(client)) {
       this.warn("Client is already added.");
-      return 0;
+      return false;
     }
 
     if (this.isValidClient(client)) {
       this.#clients.add(client);
       this.log("A new client has been added.", client);
-      return 1;
+      return true;
     }
 
     this.error(
       `Failed to add client. Invalid client interface. Expected the following methods: ${iLogger}`,
       client
     );
-    return 0;
+    return false;
   }
 
   removeClient(client) {
     if (!this.#clients.has(client)) {
       console.warn("Client not found.");
-      return;
+      return false;
     }
     this.#clients.delete(client);
+    return true;
   }
 
   clients() {
@@ -288,18 +296,24 @@ export class Logger {
       event,
       timestamp: new Date().toISOString(),
     });
-    try {
-      window.localStorage.setItem("eventLog", JSON.stringify(this.#events));
-    } catch (error) {
-      this.consoleError("Failed to save event log to localStorage:", error);
+    if (Logger.hasLocalStorage) {
+      try {
+        window.localStorage.setItem("eventLog", JSON.stringify(this.#events));
+      } catch (error) {
+        this.consoleError("Failed to save event log to localStorage:", error);
+      }
     }
     return this;
   }
 
   getEvents() {
-    return this.#events.length
-      ? this.#events
-      : JSON.parse(window.localStorage.getItem("eventLog")) || [];
+    if (this.#events.length) {
+      return this.#events;
+    }
+    if (Logger.hasLocalStorage) {
+      return JSON.parse(window.localStorage.getItem("eventLog")) || [];
+    }
+    return [];
   }
 
   /*******************************************************************
@@ -308,14 +322,18 @@ export class Logger {
    ********************************************************************/
   clearEvents() {
     this.#events = [];
-    window.localStorage.removeItem("eventLog");
+    if (Logger.hasLocalStorage) {
+      window.localStorage.removeItem("eventLog");
+    }
     console.clear();
     return this;
   }
 
   clearEventLog() {
     this.#events = [];
-    window.localStorage.removeItem("eventLog");
+    if (Logger.hasLocalStorage) {
+      window.localStorage.removeItem("eventLog");
+    }
     return this;
   }
 
@@ -330,3 +348,7 @@ export class Logger {
     return this;
   }
 }
+
+// Export a default instance for simple use cases
+const defaultLogger = new Logger();
+export default defaultLogger;
