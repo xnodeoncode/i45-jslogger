@@ -66,10 +66,10 @@ debugLogger.info("Debug information");
 analyticsLogger.suppressConsole = true; // Only log to localStorage and clients
 ```
 
-**Console output:**
+**Console output:**<br /><br />
 ![Console output](https://raw.githubusercontent.com/xnodeoncode/i45-jslogger/master/docs/images/console.png)
 
-**localStorage output:**
+**localStorage output:**<br /><br />
 ![Local storage](https://raw.githubusercontent.com/xnodeoncode/i45-jslogger/master/docs/images/local-storage.png)
 
 ## API Overview
