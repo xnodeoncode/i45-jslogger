@@ -1,8 +1,3 @@
-import { iLogger } from "./iLogger.js";
-import { iLoggerValidator } from "./iLoggerValidator.js";
-
-export { iLogger, iLoggerValidator };
-
 export class Logger {
   // Environment detection
   static isBrowser = typeof window !== "undefined";
@@ -10,6 +5,9 @@ export class Logger {
     Logger.isBrowser && typeof window.localStorage !== "undefined";
   static supportsCustomEvents =
     Logger.isBrowser && typeof CustomEvent !== "undefined";
+
+  // Required client methods
+  static #REQUIRED_METHODS = ["log", "info", "warn", "error"];
 
   // Private fields
 
@@ -240,13 +238,11 @@ export class Logger {
     return this;
   }
 
-  isValidClient(object) {
-    if (iLoggerValidator) {
-      return iLoggerValidator.isValid(object);
-    } else {
-      console.warn("iLoggerValidator is not available.");
-      return false;
-    }
+  isValidClient(client) {
+    if (!client) return false;
+    return Logger.#REQUIRED_METHODS.every(
+      (method) => typeof client[method] === "function"
+    );
   }
 
   addClient(client) {
@@ -262,7 +258,9 @@ export class Logger {
     }
 
     this.error(
-      `Failed to add client. Invalid client interface. Expected the following methods: ${iLogger}`,
+      `Failed to add client. Invalid client interface. Expected the following methods: ${Logger.#REQUIRED_METHODS.join(
+        ", "
+      )}`,
       client
     );
     return false;

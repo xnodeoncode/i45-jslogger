@@ -1,6 +1,6 @@
 {
   "name": "i45-jslogger",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "description": "A simple JavaScript logger for capturing events in the console and local storage.",
   "main": "./dist/logger.js",
   "module": "./dist/logger.js",
@@ -10,16 +10,10 @@
     ".": {
       "import": "./dist/logger.js",
       "types": "./dist/logger.d.ts"
-    },
-    "./validator": {
-      "import": "./dist/iLoggerValidator.js"
-    },
-    "./interface": {
-      "import": "./dist/iLogger.js"
     }
   },
   "scripts": {
-    "test": "node test-v1.4.0.js",
+    "test": "node tests/test-logger.js && node tests/test-default-export.js",
     "checkin": "git add . && git commit -m 'See CHANGES.md for a list of changes.'",
     "clean": "rimraf dist",
     "build": "npm run clean && rollup -c",
