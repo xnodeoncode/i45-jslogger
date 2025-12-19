@@ -6,6 +6,9 @@ export class Logger {
   static supportsCustomEvents =
     Logger.isBrowser && typeof CustomEvent !== "undefined";
 
+  // Event namespace to prevent global window pollution
+  static #EVENT_NAMESPACE = "i45-logger:";
+
   // Required client methods
   static #REQUIRED_METHODS = ["log", "info", "warn", "error"];
 
@@ -16,14 +19,11 @@ export class Logger {
   #clients;
 
   // settings
-  #enableEvents;
-  #enableLogging;
+  #loggingEnabled;
+  #enableDispatchEvents;
   #suppressNative;
   #suppressConsole;
-
-  // Deprecated fields
-  #loggingEnabled;
-  #dispatchEvents;
+  #maxEvents;
 
   constructor() {
     this.consoleLog = console.log.bind(console);
@@ -39,14 +39,11 @@ export class Logger {
     this.#events = [];
     this.#clients = new Set();
 
-    this.#enableEvents = true;
-    this.#enableLogging = true;
+    this.#loggingEnabled = true;
+    this.#enableDispatchEvents = true;
     this.#suppressNative = false;
     this.#suppressConsole = false;
-
-    // These are deprecated, use enableEvents and enableLogging properties instead.
-    this.#dispatchEvents = true;
-    this.#loggingEnabled = true;
+    this.#maxEvents = null; // null = unlimited
   }
 
   /*******************************************************************
@@ -56,37 +53,20 @@ export class Logger {
   /** Enable or disable logging globally.
    * When disabled, no logs will be recorded or output.
    * Default is true.
-   * @deprecated Use loggingEnabled property instead.
    ********************************************************************/
   get loggingEnabled() {
     return this.#loggingEnabled;
   }
 
-  /** Enable or disable logging globally.
-   * When disabled, no logs will be recorded or output.
-   * Default is true.
-   * @deprecated Use loggingEnabled property instead.
-   ********************************************************************/
   set loggingEnabled(value) {
     if (typeof value !== "boolean") {
-      throw new TypeError("loggingEnabled must be a boolean.");
+      throw new TypeError(
+        `loggingEnabled must be a boolean (true or false). Received: ${typeof value} with value: ${JSON.stringify(
+          value
+        )}`
+      );
     }
     this.#loggingEnabled = value;
-  }
-
-  /** Enable or disable logging globally.
-   * When disabled, no logs will be recorded or output.
-   * Default is true.
-   *
-   ********************************************************************/
-  set enableLogging(value) {
-    if (typeof value !== "boolean") {
-      throw new TypeError("enableLogging must be a boolean.");
-    }
-    this.#enableLogging = value;
-  }
-  get enableLogging() {
-    return this.#enableLogging;
   }
 
   get suppressNative() {
@@ -95,7 +75,9 @@ export class Logger {
 
   set suppressNative(value) {
     if (typeof value !== "boolean") {
-      throw new TypeError("suppressNative must be a boolean.");
+      throw new TypeError(
+        `suppressNative must be a boolean (true or false). Received: ${typeof value}`
+      );
     }
     this.#suppressNative = value;
   }
@@ -106,51 +88,64 @@ export class Logger {
 
   set suppressConsole(value) {
     if (typeof value !== "boolean") {
-      throw new TypeError("suppressConsole must be a boolean.");
+      throw new TypeError(
+        `suppressConsole must be a boolean (true or false). Received: ${typeof value}`
+      );
     }
     this.#suppressConsole = value;
   }
 
-  /** Enable or disable event dispatching.
+  /** Enable or disable CustomEvent dispatching to window.
    * When enabled, log events will be dispatched as CustomEvents on the window object.
    * Default is true.
-   * @deprecated Use enableEvents property instead.
-   *
    ********************************************************************/
-  get dispatchEvents() {
-    return this.#dispatchEvents;
-  }
-  /** Enable or disable event dispatching.
-   * When enabled, log events will be dispatched as CustomEvents on the window object.
-   * Default is true.
-   * @deprecated Use enableEvents property instead.
-   *
-   ********************************************************************/
-  set dispatchEvents(value) {
-    if (typeof value !== "boolean") {
-      throw new TypeError("dispatchEvents must be a boolean.");
-    }
-    this.#dispatchEvents = value;
+  get enableDispatchEvents() {
+    return this.#enableDispatchEvents;
   }
 
-  /** Enable or disable event dispatching.
-   * When enabled, log events will be dispatched as CustomEvents on the window object.
-   * Default is true.
-   *
-   ********************************************************************/
-  set enableEvents(value) {
+  set enableDispatchEvents(value) {
     if (typeof value !== "boolean") {
-      throw new TypeError("enableEvents must be a boolean.");
+      throw new TypeError(
+        `enableDispatchEvents must be a boolean (true or false). Received: ${typeof value}`
+      );
     }
-    this.#enableEvents = value;
+    this.#enableDispatchEvents = value;
   }
 
-  get enableEvents() {
-    return this.#enableEvents;
+  /** Maximum number of events to store.
+   * When limit is reached, oldest events are removed.
+   * null = unlimited (default)
+   ********************************************************************/
+  get maxEvents() {
+    return this.#maxEvents;
+  }
+
+  set maxEvents(value) {
+    if (
+      value !== null &&
+      (typeof value !== "number" || value < 0 || !Number.isInteger(value))
+    ) {
+      throw new TypeError("maxEvents must be null or a positive integer.");
+    }
+    this.#maxEvents = value;
+    // Trim existing events if needed
+    if (value !== null && this.#events.length > value) {
+      this.#events = this.#events.slice(-value);
+      if (Logger.hasLocalStorage) {
+        try {
+          window.localStorage.setItem("eventLog", JSON.stringify(this.#events));
+        } catch (error) {
+          this.consoleError(
+            "Failed to update event log in localStorage:",
+            error
+          );
+        }
+      }
+    }
   }
 
   log(message = "", ...args) {
-    if (!this.#enableLogging) return;
+    if (!this.#loggingEnabled) return;
 
     if (!this.suppressNative) {
       this.addEvent("LOG", message);
@@ -159,11 +154,17 @@ export class Logger {
       this.consoleLog(`[LOG] ${new Date().toISOString()}:`, message, ...args);
     }
     if (this.#clients.size) {
-      this.#clients.forEach((client) => client.log(message, ...args));
+      this.#clients.forEach((client) => {
+        try {
+          client.log(message, ...args);
+        } catch (error) {
+          this.consoleError("Client error in log():", error);
+        }
+      });
     }
-    if (Logger.supportsCustomEvents && this.enableEvents) {
+    if (Logger.supportsCustomEvents && this.#enableDispatchEvents) {
       window.dispatchEvent(
-        new CustomEvent("LOG", {
+        new CustomEvent(`${Logger.#EVENT_NAMESPACE}LOG`, {
           detail: { message, args, timestamp: new Date().toISOString() },
         })
       );
@@ -172,7 +173,7 @@ export class Logger {
   }
 
   info(message = "", ...args) {
-    if (!this.#enableLogging) return;
+    if (!this.#loggingEnabled) return;
     if (!this.suppressNative) {
       this.addEvent("INFO", message);
     }
@@ -180,11 +181,17 @@ export class Logger {
       this.consoleInfo(`[INFO] ${new Date().toISOString()}:`, message, ...args);
     }
     if (this.#clients.size) {
-      this.#clients.forEach((client) => client.info(message, ...args));
+      this.#clients.forEach((client) => {
+        try {
+          client.info(message, ...args);
+        } catch (error) {
+          this.consoleError("Client error in info():", error);
+        }
+      });
     }
-    if (Logger.supportsCustomEvents && this.enableEvents) {
+    if (Logger.supportsCustomEvents && this.#enableDispatchEvents) {
       window.dispatchEvent(
-        new CustomEvent("INFO", {
+        new CustomEvent(`${Logger.#EVENT_NAMESPACE}INFO`, {
           detail: { message, args, timestamp: new Date().toISOString() },
         })
       );
@@ -193,7 +200,7 @@ export class Logger {
   }
 
   warn(message = "", ...args) {
-    if (!this.#enableLogging) return;
+    if (!this.#loggingEnabled) return;
     if (!this.suppressNative) {
       this.addEvent("WARN", message);
     }
@@ -201,11 +208,17 @@ export class Logger {
       this.consoleWarn(`[WARN] ${new Date().toISOString()}:`, message, ...args);
     }
     if (this.#clients.size) {
-      this.#clients.forEach((client) => client.warn(message, ...args));
+      this.#clients.forEach((client) => {
+        try {
+          client.warn(message, ...args);
+        } catch (error) {
+          this.consoleError("Client error in warn():", error);
+        }
+      });
     }
-    if (Logger.supportsCustomEvents && this.enableEvents) {
+    if (Logger.supportsCustomEvents && this.#enableDispatchEvents) {
       window.dispatchEvent(
-        new CustomEvent("WARN", {
+        new CustomEvent(`${Logger.#EVENT_NAMESPACE}WARN`, {
           detail: { message, args, timestamp: new Date().toISOString() },
         })
       );
@@ -214,7 +227,7 @@ export class Logger {
   }
 
   error(message = "", ...args) {
-    if (!this.enableLogging) return;
+    if (!this.#loggingEnabled) return;
     if (!this.suppressNative) {
       this.addEvent("ERROR", message);
     }
@@ -226,11 +239,17 @@ export class Logger {
       );
     }
     if (this.#clients.size) {
-      this.#clients.forEach((client) => client.error(message, ...args));
+      this.#clients.forEach((client) => {
+        try {
+          client.error(message, ...args);
+        } catch (error) {
+          this.consoleError("Client error in error():", error);
+        }
+      });
     }
-    if (Logger.supportsCustomEvents && this.enableEvents) {
+    if (Logger.supportsCustomEvents && this.#enableDispatchEvents) {
       window.dispatchEvent(
-        new CustomEvent("ERROR", {
+        new CustomEvent(`${Logger.#EVENT_NAMESPACE}ERROR`, {
           detail: { message, args, timestamp: new Date().toISOString() },
         })
       );
@@ -288,12 +307,23 @@ export class Logger {
   }
 
   addEvent(type, event) {
+    // Don't add if maxEvents is 0
+    if (this.#maxEvents === 0) {
+      return this;
+    }
+
     this.#events.push({
       id: new Date().getTime(),
       type,
       event,
       timestamp: new Date().toISOString(),
     });
+
+    // Enforce maxEvents limit
+    if (this.#maxEvents !== null && this.#events.length > this.#maxEvents) {
+      this.#events = this.#events.slice(-this.#maxEvents);
+    }
+
     if (Logger.hasLocalStorage) {
       try {
         window.localStorage.setItem("eventLog", JSON.stringify(this.#events));
@@ -312,19 +342,6 @@ export class Logger {
       return JSON.parse(window.localStorage.getItem("eventLog")) || [];
     }
     return [];
-  }
-
-  /*******************************************************************
-   * @deprecated Use clearEventLog(), clearConsole(), or clearAll() instead.
-   * Clear all events from memory and localStorage, and clear the console.
-   ********************************************************************/
-  clearEvents() {
-    this.#events = [];
-    if (Logger.hasLocalStorage) {
-      window.localStorage.removeItem("eventLog");
-    }
-    console.clear();
-    return this;
   }
 
   clearEventLog() {

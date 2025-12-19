@@ -2,10 +2,19 @@
 
 A browser based logger to track events during development and testing. Log entries are written to the console as well as stored in localStorage.
 
-## ⚠️ v1.4.0 Breaking Changes
+## ⚠️ v2.0.0 Breaking Changes
 
-- `addClient()` now returns `boolean` (true/false) instead of `0|1`
-- `removeClient()` now returns `boolean` (true/false) instead of `void`
+- **Event Namespacing**: CustomEvents now use `i45-logger:` prefix
+  - Old: `window.addEventListener("LOG", ...)`
+  - New: `window.addEventListener("i45-logger:LOG", ...)`
+- **Property Names**: Better, clearer names
+  - `enableEvents` → `enableDispatchEvents` (clearer what it controls)
+  - `enableLogging` → `loggingEnabled` (better grammar)
+- **Removed Exports**: `iLogger` and `iLoggerValidator` are no longer exported
+- **Removed Deprecated**: `clearEvents()` method removed (use `clearEventLog()`, `clearConsole()`, or `clearAll()`)
+- **Return Types**: `addClient()` and `removeClient()` return `boolean` instead of `0|1`
+
+See [CHANGES.md](CHANGES.md) for full migration guide.
 
 ## Environment Support
 
@@ -102,14 +111,19 @@ logger.clearAll(); // Clear both
 
 ```javascript
 // Enable/disable logging
-logger.enableLogging = true; // Default: true
+logger.loggingEnabled = true; // Default: true
 
-// Event dispatching
-logger.enableEvents = true; // Default: true
+// CustomEvent dispatching to window
+logger.enableDispatchEvents = true; // Default: true
 
 // Suppress outputs
 logger.suppressNative = false; // Skip localStorage/events (Default: false)
 logger.suppressConsole = false; // Skip console output (Default: false)
+
+// Storage limits
+logger.maxEvents = null; // Default: null (unlimited)
+// Set to positive integer to limit stored events (oldest are removed)
+// Set to 0 to prevent event storage entirely
 ```
 
 ### Console Filtering
@@ -175,22 +189,24 @@ logger.info("User logged in", { userId: 123 }); // Logs to console AND API
 
 ## Event Listeners
 
-Subscribe to log events using window CustomEvents.
+Subscribe to log events using window CustomEvents with namespaced event names.
 
 ### Available Events
 
+Events are namespaced with `i45-logger:` prefix to prevent conflicts:
+
 ```javascript
-window.addEventListener("LOG", (event) => {
+window.addEventListener("i45-logger:LOG", (event) => {
   console.log(event.detail); // { message, args, timestamp }
 });
 
-window.addEventListener("INFO", (event) => {
+window.addEventListener("i45-logger:INFO", (event) => {
   /* ... */
 });
-window.addEventListener("WARN", (event) => {
+window.addEventListener("i45-logger:WARN", (event) => {
   /* ... */
 });
-window.addEventListener("ERROR", (event) => {
+window.addEventListener("i45-logger:ERROR", (event) => {
   /* ... */
 });
 ```
@@ -198,7 +214,7 @@ window.addEventListener("ERROR", (event) => {
 ### Disable Events
 
 ```javascript
-logger.enableEvents = false; // Stop dispatching CustomEvents
+logger.enableDispatchEvents = false; // Stop dispatching CustomEvents
 ```
 
 ## Advanced Usage
@@ -275,3 +291,20 @@ const customClient: LoggerClient = {
 
 const events: LogEvent[] = logger.getEvents();
 ```
+
+## Contributing
+
+Contributions welcome! Please see [CHANGES.md](CHANGES.md) for the full changelog and migration guides.
+
+Planning for v3.0.0 is underway - see the [v3.0.0 roadmap](https://github.com/xnodeoncode/i45-jslogger/blob/main/docs/v3.0.0.md) for upcoming features.
+
+## License
+
+MIT
+
+## Links
+
+- [npm package](https://www.npmjs.com/package/i45-jslogger)
+- [GitHub repository](https://github.com/xnodeoncode/i45-jslogger)
+- [Changelog](CHANGES.md)
+- [TypeScript Definitions](src/logger.d.ts)

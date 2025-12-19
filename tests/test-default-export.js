@@ -28,11 +28,11 @@ console.log("✓ Test 4: Multiple instances are independent");
 const logger1 = new Logger();
 const logger2 = new Logger();
 
-logger1.enableLogging = false;
-logger2.enableLogging = true;
+logger1.loggingEnabled = false;
+logger2.loggingEnabled = true;
 
-console.log(`  Logger1 enabled: ${logger1.enableLogging}`);
-console.log(`  Logger2 enabled: ${logger2.enableLogging}`);
+console.log(`  Logger1 enabled: ${logger1.loggingEnabled}`);
+console.log(`  Logger2 enabled: ${logger2.loggingEnabled}`);
 console.log("  Instances are independent\n");
 
 // Test 5: Default logger can be configured

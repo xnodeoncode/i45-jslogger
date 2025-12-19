@@ -13,7 +13,7 @@
     }
   },
   "scripts": {
-    "test": "node tests/test-logger.js && node tests/test-default-export.js",
+    "test": "node tests/test-logger.js && node tests/test-default-export.js && node tests/test-storage.js && node tests/test-clients.js && node tests/test-maxevents.js",
     "checkin": "git add . && git commit -m 'See CHANGES.md for a list of changes.'",
     "clean": "rimraf dist",
     "build": "npm run clean && rollup -c",
