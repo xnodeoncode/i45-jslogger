@@ -29,10 +29,10 @@ console.log("  All logging methods work\n");
 // Test 4: addClient returns boolean (critical fix)
 console.log("✓ Test 4: addClient returns boolean");
 const mockClient = {
-  log: (msg) => {},
-  info: (msg) => {},
-  warn: (msg) => {},
-  error: (msg) => {},
+  log: (_msg) => {},
+  info: (_msg) => {},
+  warn: (_msg) => {},
+  error: (_msg) => {},
 };
 
 const addResult = logger.addClient(mockClient);

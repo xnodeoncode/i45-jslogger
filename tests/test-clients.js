@@ -10,16 +10,16 @@ console.log("Testing client management\n");
 console.log("✓ Test 1: Multiple clients");
 const logger = new Logger();
 const client1 = {
-  log: (msg) => {},
-  info: (msg) => {},
-  warn: (msg) => {},
-  error: (msg) => {},
+  log: (_msg) => {},
+  info: (_msg) => {},
+  warn: (_msg) => {},
+  error: (_msg) => {},
 };
 const client2 = {
-  log: (msg) => {},
-  info: (msg) => {},
-  warn: (msg) => {},
-  error: (msg) => {},
+  log: (_msg) => {},
+  info: (_msg) => {},
+  warn: (_msg) => {},
+  error: (_msg) => {},
 };
 
 logger.addClient(client1);
@@ -55,14 +55,14 @@ console.log("✓ Test 4: Clients are called");
 let logCalled = false;
 let infoCalled = false;
 const trackingClient = {
-  log: (msg) => {
+  log: (_msg) => {
     logCalled = true;
   },
-  info: (msg) => {
+  info: (_msg) => {
     infoCalled = true;
   },
-  warn: (msg) => {},
-  error: (msg) => {},
+  warn: (_msg) => {},
+  error: (_msg) => {},
 };
 const logger2 = new Logger();
 logger2.addClient(trackingClient);
