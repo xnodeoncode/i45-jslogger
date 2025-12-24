@@ -1,5 +1,9 @@
 [NodeJS package](https://www.npmjs.com/package/i45-jslogger)
 
+[![npm version](https://img.shields.io/npm/v/i45-jslogger)](https://www.npmjs.com/package/i45-jslogger)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A browser based logger to track events during development and testing. Log entries are written to the console as well as stored in localStorage.
 
 ## ⚠️ v2.0.0 Breaking Changes
@@ -15,6 +19,8 @@ A browser based logger to track events during development and testing. Log entri
 - **Return Types**: `addClient()` and `removeClient()` return `boolean` instead of `0|1`
 
 See [CHANGES.md](CHANGES.md) for full migration guide.
+
+See [ROADMAP.md](docs/roadmap.md) to see future plans.
 
 ## Environment Support
 
